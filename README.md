@@ -1,5 +1,5 @@
 * Setup
-  - Run "chmod 755 bin/start_docker_and_run_tests.sh" 
+  - Run `chmod 755 bin/start_docker_and_run_tests.sh` 
   - `./start_docker_and_run_tests.sh` to start the docker container and run the tests.
     - Why docker is not added as `fixture` in tests?
       - If we run pytests in parallel, the docker container will be started multiple times. We don't want that.
