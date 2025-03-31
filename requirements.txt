@@ -1,0 +1,9 @@
+waii-sdk-py==1.29.2
+pytest
+waii-sdk-py
+PyYAML
+pydantic
+uuid
+pandas
+pytest-xdist
+pytest-html

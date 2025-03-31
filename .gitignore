@@ -1,0 +1,15 @@
+# Python bytecode
+*.pyc
+__pycache__/
+
+# Virtual environment directories
+.venv/
+env/
+venv/
+
+# Log files
+*.log
+/tmp/
+
+# OS files
+.DS_Store
