@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import time
 
 import pytest
@@ -7,7 +8,7 @@ from waii_sdk_py.database import DBConnectionIndexingStatus
 from waii_sdk_py.query import LikeQueryRequest
 
 
-def wait_for_connector_status(api_client, alias_key):
+def wait_for_connector_status(api_client, alias_key, retry=10, logger:logging.Logger = None):
     # Get the connector status for the given alias_key
     connector_statuses = api_client.database.get_connections().connector_status
     if alias_key not in connector_statuses:
@@ -16,19 +17,18 @@ def wait_for_connector_status(api_client, alias_key):
     db_conn_status: DBConnectionIndexingStatus = connector_statuses[alias_key]
 
     # Retry for a maximum of 60 seconds (retry every 10 seconds, up to 6 times)
-    retry = 10
     status = db_conn_status.status
     while retry > 0:
         if status is None or status != 'completed':
-            print(f"Connection not ready for {alias_key}: current status: {db_conn_status.status}")
+            logger.info(f"About to get connected status for : {alias_key}; Will retry {retry} times, {connector_statuses[alias_key]}")
             time.sleep(10)
             retry -= 1
-            status = db_conn_status.status
+            status = api_client.database.get_connections().connector_status[alias_key].status
         else:
             break
 
     if status == 'completed':
-        print(f"Connection ready for {alias_key}: status: {db_conn_status.status}")
+        logger.info(f"Connection ready for {alias_key}: status: {db_conn_status.status}")
         return True
     else:
         return False
@@ -60,3 +60,9 @@ def verify_sample_values(api_client, table_name, column_name, should_be_none):
 def like_query(question, query, client:Waii):
     question_hash = hashlib.md5(question.encode('utf-8')).hexdigest()
     client.query.like(LikeQueryRequest(query_uuid=question_hash, ask=question, query=query, liked=True))
+
+
+def init_api_client(base_url, api_key):
+    client = Waii()
+    client.initialize(url=base_url, api_key=api_key)
+    return client
