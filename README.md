@@ -28,10 +28,16 @@
     - Notice that MOVIE_DB will not be loaded in this docker. We plan to have local TWEAKIT itself for this. (to reduce time and cost)
 
 # Running Tests:
-  - To run specific test (from root folder):
+  - To run specific test (from root folder):  [PREFER THIS FOR TIME BEING. REFER FAQ]
     - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_basic_postgres_add/test_basic_postgres_add.py`
   - To run all tests:
     - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html`
+
+   
+![screenshot](Multiple_Dockers.png)
+
+
+![screenshot](Sample_Output.png)
 
 # Debugging:
   - We intentionally do not delete the docker containers after the tests are run. In case you need to debug, you can do it. 
