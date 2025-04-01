@@ -1,10 +1,10 @@
 
-* Context:
+# Context:
   - This repository contains integration tests for the WAII system. 
   - Tests are designed to run against dockerized environments. Each test class can specify its desired Docker configuration via custom markers. 
   - Tests are executed in parallel using pytest, while ensuring that tests using the same docker configuration run on the same worker.
 
-* High level details:
+# High level details:
   * Docker Configurations:
     - Different docker configurations are available (and can be added) in `tests/docker_launcher/docker_configs.py`. Each command has the following:
       - Fully formatted Docker run command
@@ -18,28 +18,28 @@
     - class_setup_api_client (class‑scoped):
       - Retrieves the base URL and API key from the current Docker configuration and then calls your custom setup and cleanup methods (custom_setup/custom_cleanup) defined on your test class.
   * Parallel Execution:
-    - With pytest -n N and the --dist=loadscope option (set in pytest.ini), tests within the same class or module are guaranteed to run on the same worker.
+    - With `pytest -n N` and the `--dist=loadscope` option (set in `pytest.ini`), tests within the same class or module are guaranteed to run on the same worker.
         - This minimizes container conflicts and ensures that a single Docker container is shared for all tests in one class.
   
 
-* Setup:
+# Setup:
   - `pip install -r requirements.txt`
   - Review docker configuration in `tests/docker_launcher/docker_configs.py`
     - Notice that MOVIE_DB will not be loaded in this docker. We plan to have local TWEAKIT itself for this. (to reduce time and cost)
 
-* Running Tests:
+# Running Tests:
   - To run specific test (from root folder):
     - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_basic_postgres_add/test_basic_postgres_add.py`
   - To run all tests:
     - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html`
 
-* Debugging:
+# Debugging:
   - We intentionally do not delete the docker containers after the tests are run. In case you need to debug, you can do it. 
   - When tests are started, all containers and its pg/log folders will be deleted.
   - logs about tests are written in `logs` folder.
   - reports are written to `reports` folder.
 
-* FAQ / Yet to fix:
+# FAQ / Yet to fix:
   - I have same docker for multiple test classes. It seems slow.
     - Tests belonging to same docker configs are grouped together and scheduled in the same worker. Within this, it will be executed in sequential mode.
       - It is possible to create additional docker configs with different port numbers and use them in the test classes. This will ensure that the tests are run in parallel.
