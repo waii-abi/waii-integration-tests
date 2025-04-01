@@ -29,7 +29,8 @@
 
 # Running Tests:
   - To run specific test (from root folder):  [PREFER THIS FOR TIME BEING. REFER FAQ]
-    - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_basic_postgres_add/test_basic_postgres_add.py`
+    - To run dummy demo to spin up multiple dockers, `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_dummy/test_dummy.py`
+    - To run basic sample test, `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_basic_postgres_add/test_basic_postgres_add.py`
   - To run all tests:
     - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html`
 
