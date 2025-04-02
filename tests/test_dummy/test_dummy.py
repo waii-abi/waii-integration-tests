@@ -33,13 +33,13 @@ class Test_docker_waii_default:
 
     def test_feature_one(self, docker_environment):
         logger.info("Running Test_docker_waii_default.feature_one;")
-        time.sleep(5)
+        time.sleep(2)
         api_client = self.api_client
         assert api_client is not None
 
     def test_feature_two(self, docker_environment):
         logger.info("Running Test_docker_waii_default.test_feature_two;")
-        time.sleep(5)
+        time.sleep(2)
         api_client = self.api_client
         assert api_client is not None
 
@@ -63,13 +63,13 @@ class Test_docker_waii_default_ex_1:
 
     def test_feature_one(self, docker_environment):
         logger.info("Running Test_docker_waii_default_ex_1.test_feature_one;")
-        time.sleep(5)
+        time.sleep(2)
         api_client = self.api_client
         assert api_client is not None
 
     def test_feature_two(self, docker_environment):
         logger.info("Running Test_docker_waii_default_ex_1.test_feature_two;")
-        time.sleep(5)
+        time.sleep(2)
         api_client = self.api_client
         assert api_client is not None
 
@@ -93,12 +93,12 @@ class Test_docker_waii_default_ex_2:
 
     def test_feature_one(self, docker_environment):
         logger.info("Running Test_docker_waii_default_ex_2.test_feature_one;")
-        time.sleep(5)
+        time.sleep(2)
         api_client = self.api_client
         assert api_client is not None
 
     def test_feature_two(self, docker_environment):
         logger.info("Running Test_docker_waii_default_ex_2.test_feature_two;")
-        time.sleep(5)
+        time.sleep(2)
         api_client = self.api_client
         assert api_client is not None

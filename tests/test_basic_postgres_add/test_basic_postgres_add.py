@@ -42,7 +42,7 @@ CONNECTION = {
 logger = init_logger(log_file="logs/test_basic_postgres_add.log")
 
 
-@pytest.mark.docker_config("waii_default")
+@pytest.mark.docker_config("waii_default_postgres")
 class Test_Basic_Postgres_Add:
 
     # declare a class level api_client
