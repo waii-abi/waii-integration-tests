@@ -34,6 +34,10 @@
     - To run basic sample test, `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_basic_postgres_add/test_basic_postgres_add.py`
   - To run all tests:
     - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html`
+  - To run against existing docker:
+    - There are cases, when existing docker is running and we don't want to spin up containers. We just need to run the test against default 'http://localhost:9859/api/'. 
+    - If so, comment out `@pytest.mark.docker_config(..)` for the class and run the test cases. E.g
+      - `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_knowledge_import/test_knowledge_import.py`
 
    
 ![screenshot](Multiple_Dockers.png)

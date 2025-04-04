@@ -18,12 +18,13 @@ def docker_environment(request):
       - Yields control for the test class, then stops the container on teardown.
     """
 
-    # marker = request.node.get_closest_marker("docker_config")
-    # logger.info(f"docker_config marker: {marker}")
-    # config_key = marker.args[0] if marker else "waii_default"
-    # config = DOCKER_CONFIGS.get(config_key)
     config, docker_name = get_config_for_docker(request)
-
+    logger.info(f"Running tests for {docker_name}")
+    if not config or docker_name not in DOCKER_CONFIGS:
+        logger.info(f"Skipping docker creation for {docker_name}; Run the function")
+        yield
+    if not config or docker_name not in DOCKER_CONFIGS:
+        return
 
     # Use the fully formatted run_command and ready_message from the configuration.
     ready_message = config["ready_message"]
@@ -50,12 +51,15 @@ def docker_environment(request):
     yield  # Tests in the class execute here.
 
     # TODO: If you don't want want docker container to stop, comment out the following for debugging
-    print(f"Stopping Docker container with configuration: {container_name}")
-    stop_docker_container(container_name)
+    #print(f"Stopping Docker container with configuration: {container_name}")
+    #stop_docker_container(container_name)
 
 def get_config_for_docker(request):
     marker = request.node.get_closest_marker("docker_config")
     logger.info(f"docker_config marker in class_setup_api_client: {marker}")
+    if marker is None:
+        logger.info("No docker_config marker found. Using default configuration.")
+        return "", ""
     docker_name = marker.args[0] if marker else "waii_default"
     config = DOCKER_CONFIGS.get(docker_name)
     if not config:
@@ -69,8 +73,14 @@ def class_setup_api_client(request, docker_environment):
     It initializes API_CLIENT and passes it to custom_setup() and custom_cleanup() methods of the test class.
     """
     config, docker_name = get_config_for_docker(request)
-    base_url = get_base_url(config)
-    api_key = config.get("api_key")
+
+    # In case docker config is not present, let us use defaults
+    if not config or docker_name not in DOCKER_CONFIGS:
+        base_url = "http://localhost:9859/api/"
+        api_key = ""
+    else:
+        base_url = get_base_url(config)
+        api_key = config.get("api_key")
     cls = request.cls
     logger.info(f"Starting API client with configuration: url: {base_url}, api_key: {api_key} for docker: {docker_name}")
     api_client = init_api_client(base_url=base_url, api_key=api_key)
