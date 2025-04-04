@@ -55,7 +55,7 @@ SCHEMA_NAME = "TWEAKIT"
 logger = init_logger(log_file="logs/test_knowledge_import.log")
 
 
-# @pytest.mark.docker_config("waii_default")
+@pytest.mark.docker_config("waii_default")
 class TestKnowledgeImport:
     # declare a class level api_client
     apiclient = None
