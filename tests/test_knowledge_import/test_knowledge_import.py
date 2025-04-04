@@ -3,6 +3,7 @@ import time
 from pathlib import Path
 from typing import cast
 
+import pytest
 from waii_sdk_py import Waii
 from waii_sdk_py.database import ModifyDBConnectionRequest, DBConnection, DBContentFilter, DBContentFilterScope, \
     DBContentFilterType, DBContentFilterActionType, IngestDocumentRequest, DatabaseImpl, \
