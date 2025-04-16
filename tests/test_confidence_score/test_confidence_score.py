@@ -50,7 +50,7 @@ CONNECTION = {
 DB_NAME = "test"
 SCHEMA_NAME = "TWEAKIT"
 # Init the logger for this class
-logger = init_logger(log_file="logs/test_knowledge_import.log")
+logger = init_logger(log_file="logs/test_confidence_score.log")
 
 
 @pytest.mark.docker_config("waii_default")
@@ -141,8 +141,9 @@ class TestConfidenceScore:
                 "num_joins",
                 "semantic_context_used",
                 "retry_info",
-                "num_fsl_queries",
-                "fsl_cosine_similarity"
+                # These only happen when queries are matched and FSL_SIMILARITY_SIGNAL_ENABLED is enabled
+                # "num_fsl_queries",
+                # "fsl_cosine_similarity"
             ]
 
             missing_keys = []

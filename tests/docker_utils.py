@@ -10,6 +10,9 @@ logger = init_logger()
 
 def start_docker_container(run_command, ready_message, startup_timeout, container_name):
     """Starts a Docker container using the provided run_command and waits until the ready_message is detected."""
+    if str(container_name).endswith("_local"):
+        logger.info("start_docker_container: local process")
+        return None
     proc = subprocess.Popen(
         run_command,
         shell=True,
@@ -43,6 +46,9 @@ def start_docker_container(run_command, ready_message, startup_timeout, containe
 
 def cleanup_existing_container(container_name):
     """Stop and remove any existing Docker container with the given name."""
+    if str(container_name).endswith("_local"):
+        logger.info("cleanup_existing_container: local process")
+        return
     logger.info(f"Cleaning up any existing Docker container '{container_name}'...")
     subprocess.run(["docker", "stop", container_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     subprocess.run(["docker", "rm", "-f", container_name], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -57,6 +63,9 @@ def cleanup_existing_container(container_name):
 
 def stop_docker_container(container_name):
     """Stops the Docker container with the specified name."""
+    if str(container_name).endswith("_local"):
+        logger.info("stop_docker_container: local process")
+        return
     subprocess.run(["docker", "stop", container_name], check=True)
     logger.info(f"Docker container '{container_name}' stopped.")
 

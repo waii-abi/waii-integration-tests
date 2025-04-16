@@ -9,7 +9,13 @@ venv/
 
 # Log files
 *.log
-/tmp/
+logs/
+
+# Sandbox directory
+waii-sandbox-test-integ/
 
 # OS files
 .DS_Store
+
+# IDE
+.idea/

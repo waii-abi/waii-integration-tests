@@ -46,13 +46,14 @@ def docker_environment(request):
     cleanup_existing_container(container_name)
 
     logger.info(f"Starting Docker container with configuration: {container_name}")
-    proc = start_docker_container(run_command, ready_message, startup_timeout, container_name)
+    start_docker_container(run_command, ready_message, startup_timeout, container_name)
 
     yield  # Tests in the class execute here.
 
-    # TODO: If you don't want want docker container to stop, comment out the following for debugging
-    #print(f"Stopping Docker container with configuration: {container_name}")
-    #stop_docker_container(container_name)
+    # TODO: If you want docker container to stop, uncomment out the following
+    # print(f"Stopping Docker container with configuration: {container_name}")
+    # stop_docker_container(container_name) # Just stop
+    # cleanup_existing_container(container_name) # Stop and clean
 
 def get_config_for_docker(request):
     marker = request.node.get_closest_marker("docker_config")
