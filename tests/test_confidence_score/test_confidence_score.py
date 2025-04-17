@@ -26,9 +26,30 @@ Note: If you already have docker, you can comment `@pytest.mark.docker_config("w
 - Test confidence score
 """
 
-CONN_KEY = "postgresql://waii@localhost:5432/test"
+ORACLE_CONN_KEY = "oracle://movie_db_user@localhost:1521/movie_db"
 
-CONNECTION = {
+ORACLE_CONNECTION = {
+    "key": "oracle://movie_db_user@localhost:1521/movie_db",
+    "db_type": "oracle",
+    "password": "password",
+    "description": None,
+    "username": "movie_db_user",
+    "database": "movie_db",
+    "host": "localhost",
+    "port": "1521",
+    "sample_col_values": True,
+    "push": False,
+    "embedding_model": "text-embedding-ada-002",
+    "db_access_policy": {
+        "read_only": False,
+        "allow_access_beyond_db_content_filter": True,
+        "allow_access_beyond_search_context": True
+    }
+}
+
+PG_CONN_KEY = "postgresql://waii@localhost:5432/test"
+
+PG_CONNECTION = {
     "key": "postgresql://waii@localhost:5432/test",
     "db_type": "postgresql",
     "password": "password",
@@ -47,13 +68,16 @@ CONNECTION = {
     }
 }
 
+CONN_KEY = ORACLE_CONN_KEY
+CONNECTION = ORACLE_CONNECTION
+
 DB_NAME = "test"
 SCHEMA_NAME = "TWEAKIT"
 # Init the logger for this class
 logger = init_logger(log_file="logs/test_confidence_score.log")
 
 
-@pytest.mark.docker_config("waii_default")
+@pytest.mark.docker_config("krishna_birla_local")
 class TestConfidenceScore:
     # declare a class level api_client
     apiclient = None
@@ -80,12 +104,12 @@ class TestConfidenceScore:
     @staticmethod
     def add_db_connection(client):
         db_conn = DBConnection(**CONNECTION)
-        db_conn.db_content_filters = [DBContentFilter(
-            filter_scope=DBContentFilterScope.table,
-            filter_type=DBContentFilterType.include,
-            filter_action_type=DBContentFilterActionType.visibility,
-            pattern='(DB_OWNER_STORAGE|USERS|PARAMETERS)'
-        )]
+        # db_conn.db_content_filters = [DBContentFilter(
+        #     filter_scope=DBContentFilterScope.table,
+        #     filter_type=DBContentFilterType.include,
+        #     filter_action_type=DBContentFilterActionType.visibility,
+        #     pattern='(DB_OWNER_STORAGE|USERS|PARAMETERS)'
+        # )]
 
         try:
             response = client.database.modify_connections(params=ModifyDBConnectionRequest(updated=[db_conn]))
@@ -114,14 +138,15 @@ class TestConfidenceScore:
         """
 
         client = self.apiclient
-        logger.info(f"Running test_add_postgres_connection; resource = {self.resource}")
+        logger.info(f"Running test_confidence_score; resource = {self.resource}")
         try:
 
             # Verify if sample value is available
-            verify_sample_values(client, "DB_OWNER_STORAGE", "DB_KEY", should_be_none=False)
+            # verify_sample_values(client, "DB_OWNER_STORAGE", "DB_KEY", should_be_none=False)
 
             # Run a query and verify it generates query
-            ask = "show me the total parameters available in tweakit schema"
+            # A liked query exists: "list any 5 movies"
+            ask = "list any 5 films"
             response = client.query.generate(params=QueryGenerationRequest(ask=ask))
             assert response is not None and response.query is not None, "Response should not be None"
             logger.info(f"Query response: {response.query}, debug_info: {response.debug_info}")
@@ -141,9 +166,10 @@ class TestConfidenceScore:
                 "num_joins",
                 "semantic_context_used",
                 "retry_info",
+                # One liked query should get matched at least
                 # These only happen when queries are matched and FSL_SIMILARITY_SIGNAL_ENABLED is enabled
-                # "num_fsl_queries",
-                # "fsl_cosine_similarity"
+                "num_fsl_queries",
+                "fsl_cosine_similarity"
             ]
 
             missing_keys = []
