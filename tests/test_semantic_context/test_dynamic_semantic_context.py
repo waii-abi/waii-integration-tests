@@ -44,7 +44,7 @@ SCHEMA_NAME = "TWEAKIT"
 # Init the logger for this class
 logger = init_logger(log_file="logs/test_dynamic_semantic_context.log")
 
-@pytest.mark.docker_config("krishna_birla_local")
+@pytest.mark.docker_config("waii_default_postgres")
 class TestConfidenceScore:
     # declare a class level api_client
     apiclient = None
