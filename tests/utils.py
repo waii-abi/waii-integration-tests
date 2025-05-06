@@ -4,7 +4,7 @@ import time
 
 import pytest
 from waii_sdk_py import Waii
-from waii_sdk_py.database import DBConnectionIndexingStatus
+from waii_sdk_py.database import DBConnectionIndexingStatus, DBConnection, ModifyDBConnectionRequest
 from waii_sdk_py.query import LikeQueryRequest
 
 
@@ -32,6 +32,31 @@ def wait_for_connector_status(api_client, alias_key, retry=10, logger:logging.Lo
         return True
     else:
         return False
+
+def add_db_connection(client, connection, conn_key, logger):
+    db_conn = DBConnection(**connection)
+    # db_conn.db_content_filters = [DBContentFilter(
+    #     filter_scope=DBContentFilterScope.table,
+    #     filter_type=DBContentFilterType.include,
+    #     filter_action_type=DBContentFilterActionType.visibility,
+    #     pattern='(DB_OWNER_STORAGE|USERS|PARAMETERS)'
+    # )]
+
+    try:
+        response = client.database.modify_connections(params=ModifyDBConnectionRequest(updated=[db_conn]))
+
+        client.database.activate_connection(conn_key)
+        logger.info(f"Activated alias: {conn_key}")
+
+        logger.info(f"Check Connector status: {conn_key}")
+        connector_statuses = client.database.get_connections().connector_status
+        logger.info(f"Local Connector status: {connector_statuses}")
+
+        # Wait for connector status to be ready
+        status = wait_for_connector_status(client, conn_key, retry=60, logger=logger)
+        assert status is True, f"Connection for alias {conn_key} is not ready."
+    except Exception as e:
+        logger.error(f"Failed to connect to alias {conn_key}, {str(e)}")
 
 
 def verify_sample_values(api_client, table_name, column_name, should_be_none):

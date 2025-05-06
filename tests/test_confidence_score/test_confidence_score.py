@@ -13,7 +13,7 @@ from waii_sdk_py.semantic_context import ModifySemanticContextRequest, GetSemant
     GetSemanticContextRequestFilter
 
 from tests.log_util import init_logger
-from tests.utils import wait_for_connector_status, verify_sample_values
+from tests.utils import wait_for_connector_status, verify_sample_values, add_db_connection
 
 """
 
@@ -94,38 +94,12 @@ class TestConfidenceScore:
             return
 
         cls.apiclient = api_client
-        cls.add_db_connection(api_client)
+        add_db_connection(api_client, CONNECTION, CONN_KEY, logger)
 
     @classmethod
     def custom_cleanup(cls, api_client):
         logger.info(f"Cleaning up resources for {cls.__name__} with api_client:{api_client}")
         cls.apiclient = api_client
-
-    @staticmethod
-    def add_db_connection(client):
-        db_conn = DBConnection(**CONNECTION)
-        # db_conn.db_content_filters = [DBContentFilter(
-        #     filter_scope=DBContentFilterScope.table,
-        #     filter_type=DBContentFilterType.include,
-        #     filter_action_type=DBContentFilterActionType.visibility,
-        #     pattern='(DB_OWNER_STORAGE|USERS|PARAMETERS)'
-        # )]
-
-        try:
-            response = client.database.modify_connections(params=ModifyDBConnectionRequest(updated=[db_conn]))
-
-            client.database.activate_connection(CONN_KEY)
-            logger.info(f"Activated alias: {CONN_KEY}")
-
-            logger.info(f"Check Connector status: {CONN_KEY}")
-            connector_statuses = client.database.get_connections().connector_status
-            logger.info(f"Local Connector status: {connector_statuses}")
-
-            # Wait for connector status to be ready
-            status = wait_for_connector_status(client, CONN_KEY, retry=60, logger=logger)
-            assert status is True, f"Connection for alias {CONN_KEY} is not ready."
-        except Exception as e:
-            logger.error(f"Failed to connect to alias {CONN_KEY}, {str(e)}")
 
     def test_confidence_score(self, docker_environment):
         """
