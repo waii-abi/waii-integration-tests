@@ -1,0 +1,3 @@
+- For snowflake, `pytest -s -n 6 --html=reports/report_$(date +"%Y-%m-%d_%H-%M-%S_%3N").html --self-contained-html tests/test_multi_db/test_multi_db_snowflake.py`
+  - This is not docker based, but will run against your local deployment. If you need isolated env, try to run in separate deployment_name (i.e db)
+- 
