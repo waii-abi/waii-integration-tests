@@ -77,8 +77,11 @@ class TestMultiDB:
         try:
 
             # Delete the connection (to be on safer side)
-            client.database.modify_connections(ModifyDBConnectionRequest(removed=[CONN_KEY]))
-            logger.info("Removed existing multi-db connection")
+            try:
+                client.database.modify_connections(ModifyDBConnectionRequest(removed=[CONN_KEY]))
+                logger.info("Removed existing multi-db connection")
+            except Exception as e:
+                logger.error(f"Failed to remove existing connection {CONN_KEY}, {str(e)}")
 
             response: ModifyDBConnectionResponse = client.database.modify_connections(
                 ModifyDBConnectionRequest(
@@ -329,7 +332,7 @@ class TestMultiDB:
                                 SearchContext(
                                     db_name="CINE_DB",
                                     type=FilterType.EXCLUSION,
-                                    table_name="PEOPLE"
+                                    table_name=r"(?i)\b(peo\w*|som\w*)\b"
                                 )
                             ]
                         )

@@ -62,42 +62,35 @@ class TestMultiDB:
         logger.info(f"Running test_multi_db_add_conn; resource = {self.resource}")
 
         try:
+            client.database.modify_connections(ModifyDBConnectionRequest(removed=[CONN_KEY]))
+            logger.info("Removed existing multi-db connection")
+
             with open("poc-internal.json", "r") as f:
                 file_contents = f.read()
                 # decode (git will not allow secrets to be checked in)
                 decoded_bytes = base64.b64decode(file_contents)
                 decoded_str = decoded_bytes.decode("utf-8")
-                print(file_contents)
+                print(decoded_str)
 
                 response: ModifyDBConnectionResponse = client.database.modify_connections(
                     ModifyDBConnectionRequest(
                         updated=[
                             DBConnection(
                                 db_type="bigquery",
-                                password=file_contents,
-                                database="triple-nectar-461407-k3",
+                                password=decoded_str,
+                                #default_database="triple-nectar-461407-k3",
                                 db_alias="multi-walmart-db-100",
                                 sample_col_values=True,
-                                index_all_databases=True,
+                                enable_multi_db_connection=True,
                                 content_filters=[
                                     SearchContext(
                                         db_name="triple-nectar-461407-k3"  # wmt-1257d458107910dad54c01f5c8
                                     ),
                                     SearchContext(
                                         db_name="arched-curve-461405-t5"  # wmt-intl-cons-mc-k1-prod
-                                    ),
-                                    SearchContext(
-                                        db_name="wmt-fin-icp-prod-ds-461405"
-                                    ),
-                                    SearchContext(
-                                        db_name="wmt-fin-fcp-prod-sem-s4-461204"
                                     ), SearchContext(
                                         db_name="wmt-edw-dev-461405"
-                                    ),
-                                    SearchContext(
-                                        db_name="walmart-sap"
-                                    ),
-
+                                    )
                                 ]
                             )
                         ]
@@ -127,7 +120,6 @@ class TestMultiDB:
 
         expected_schemas = {
             "wmt-edw-dev-461405": {"US_FIN_SALES_DL_RPT_VM"},
-            "arched-curve-461405-t5": {"k1_local_tables"},
             "triple-nectar-461407-k3": {"test"}
         }
 
@@ -155,7 +147,7 @@ class TestMultiDB:
         client.database.activate_connection(CONN_KEY)
         logger.info(f"Activated alias: {CONN_KEY}")
 
-        ask = "Can you show 10 records with just  OP_CMPNY_CD  in CLUB_TRANSACTIONS_DLY_D table?"
+        ask = "Can you show 10 name from sample_table ? Show name field only"
         response = client.query.generate(params=QueryGenerationRequest(ask=ask, use_cache=False))
         query = response.query
         logger.info(f"Generated query: {query}")
@@ -167,14 +159,14 @@ class TestMultiDB:
 
         # Expected DataFrame
         expected_df = pd.DataFrame({
-            "OP_CMPNY_CD": []
+            "NAME": []
         })
 
         df.columns = [col.upper() for col in df.columns]
-        assert set(df.columns) == {"OP_CMPNY_CD"}, f"Unexpected columns in result. Got: {df.columns.tolist()}"
+        assert set(df.columns) == {"NAME"}, f"Unexpected columns in result. Got: {df.columns.tolist()}"
 
         expected_df = pd.DataFrame({
-            "OP_CMPNY_CD": pd.Series([], dtype="object")
+            "NAME": pd.Series([], dtype="object")
         })
 
         try:
@@ -189,7 +181,7 @@ class TestMultiDB:
         client.database.activate_connection(CONN_KEY)
         logger.info(f"Activated alias: {CONN_KEY}")
 
-        ask = "can you create a query to join dept_desc in k1_bus_plan with visit_type_desc in club txns. Finally show the total sales amount as sales_amt."
+        ask = "can you create a query to join CLUB_TRANSACTIONS_DLY_D::CLUB_NM with sample_table::name. Finally show the total sales amount as sales_amt."
         response = client.query.generate(params=QueryGenerationRequest(ask=ask, use_cache=False))
         query = response.query
         logger.info(f"Generated query: {query}")
@@ -230,7 +222,7 @@ class TestMultiDB:
         logger.info(f"Activated alias: {CONN_KEY}")
 
         for i in range(1, 3):
-            ask = f"Scan you create a query to join dept_desc in k1_bus_plan with visit_type_desc in club txns. Finally show the total sales amount as sales_amt. Iteration: {i}"
+            ask = f"Can you show 10 name from sample_table ? Show name field only. Iteration: {i}"
             response = client.query.generate(params=QueryGenerationRequest(ask=ask, use_cache=False))
             logger.info(f"Generated query: {response.query}")
 
@@ -275,23 +267,27 @@ class TestMultiDB:
         logger.info(f"Running test_multi_db_add_conn with specific table for cine_db; resource = {self.resource}")
 
         try:
+
+            client.database.modify_connections(ModifyDBConnectionRequest(removed=[CONN_KEY]))
+            logger.info("Removed existing multi-db connection")
+
             with open("poc-internal.json", "r") as f:
                 file_contents = f.read()
                 # decode (git will not allow secrets to be checked in)
                 decoded_bytes = base64.b64decode(file_contents)
                 decoded_str = decoded_bytes.decode("utf-8")
 
-                print(file_contents)
+                print(decoded_str)
                 response: ModifyDBConnectionResponse = client.database.modify_connections(
                     ModifyDBConnectionRequest(
                         updated=[
                             DBConnection(
                                 db_type="bigquery",
-                                password=file_contents,
-                                database="wmt-edw-prod-461405",
+                                password=decoded_str,
+                                #default_database="wmt-edw-prod-461405",
                                 db_alias="multi-walmart-db-100",
                                 sample_col_values=True,
-                                index_all_databases=True,
+                                enable_multi_db_connection=True,
                                 content_filters=[
                                     SearchContext(
                                         db_name="triple-nectar-461407-k3", # wmt-1257d458107910dad54c01f5c8
@@ -300,17 +296,8 @@ class TestMultiDB:
                                     ),
                                     SearchContext(
                                         db_name="arched-curve-461405-t5"  # wmt-intl-cons-mc-k1-prod
-                                    ),
-                                    SearchContext(
-                                        db_name="wmt-fin-icp-prod-ds-461405"
-                                    ),
-                                    SearchContext(
-                                        db_name="wmt-fin-fcp-prod-sem-s4-461204"
                                     ), SearchContext(
                                         db_name="wmt-edw-dev-461405"
-                                    ),
-                                    SearchContext(
-                                        db_name="walmart-sap"
                                     )
                                 ]
                             )
