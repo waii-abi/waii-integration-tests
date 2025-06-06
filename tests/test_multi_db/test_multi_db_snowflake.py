@@ -75,6 +75,11 @@ class TestMultiDB:
         logger.info(f"Running test_multi_db_add_conn; resource = {self.resource}")
 
         try:
+
+            # Delete the connection (to be on safer side)
+            client.database.modify_connections(ModifyDBConnectionRequest(removed=[CONN_KEY]))
+            logger.info("Removed existing multi-db connection")
+
             response: ModifyDBConnectionResponse = client.database.modify_connections(
                 ModifyDBConnectionRequest(
                     updated=[
@@ -84,11 +89,11 @@ class TestMultiDB:
                             account_name="gqobxjv-bhb91428",
                             role="MULTI_DB_JOIN_1",
                             password="jifsaP-vuccoc-ropze0",
-                            database="MOVIE_DB",
+                            #default_database="MOVIE_DB",
                             warehouse="COMPUTE_WH",
                             db_alias="snowflake-multi-db-100",
                             sample_col_values=True,
-                            index_all_databases=True,
+                            enable_multi_db_connection=True,
                             content_filters=[
                                 SearchContext(
                                     db_name="MOVIE_DB"
@@ -296,6 +301,10 @@ class TestMultiDB:
         logger.info(f"Running test_multi_db_add_conn with specific table for cine_db; resource = {self.resource}")
 
         try:
+            # Delete the connection
+            client.database.modify_connections(ModifyDBConnectionRequest(removed=[CONN_KEY]))
+            logger.info("Removed existing multi-db connection")
+
             response: ModifyDBConnectionResponse = client.database.modify_connections(
                 ModifyDBConnectionRequest(
                     updated=[
@@ -305,11 +314,11 @@ class TestMultiDB:
                             account_name="gqobxjv-bhb91428",
                             role="MULTI_DB_JOIN_1",
                             password="jifsaP-vuccoc-ropze0",
-                            database="MOVIE_DB",
+                            #default_database="MOVIE_DB",
                             warehouse="COMPUTE_WH",
                             db_alias="snowflake-multi-db-100",
                             sample_col_values=True,
-                            index_all_databases=True,
+                            enable_multi_db_connection=True,
                             content_filters=[
                                 SearchContext(
                                     db_name="MOVIE_DB"
